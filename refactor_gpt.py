@@ -1,48 +1,23 @@
+import os
 from llama_index import PromptTemplate
 from llama_index.program import LLMTextCompletionProgram
 from llama_index.output_parsers import PydanticOutputParser
 from llama_index.llms import Bedrock
-from pydantic import BaseModel, Field
-from typing import List
 import json
 from llama_index.llms import OpenAI
 from llama_index import PromptTemplate
+from business_classes import BusinessProblemModel
+from dotenv import load_dotenv
+load_dotenv()
 
 
-# Pydantic classes for data modeling
-class Step(BaseModel):
-    step_id: int
-    description: str
-    rationale: str
-    expected_outcomes: str
-    metrics_for_success: str
+# Read openai key from env file
 
+# Read openai key from env file
+openai_key = os.getenv("OPENAI_KEY")
 
-class ActionPlan(BaseModel):
-    steps: List[Step]
-
-
-class Solution(BaseModel):
-    solution_id: int
-    description: str
-    solution_keywords: List[str] = Field(
-        ..., description="List of keywords that relate to the solution description")
-    rationale: str
-    action_plan: ActionPlan
-
-
-class BusinessProblemModel(BaseModel):
-    business_problem: str
-    query_keywords: List[str] = Field(
-        ..., description="List of keywords that relate to the business problem")
-    solutions: List[Solution] = Field(...)
-    business_type: str = Field(..., description="Type of business")
-    business_impact: str = Field(..., description="Impact of business")
-    user_objective: str = Field(..., description="User objective")
 
 # Function to generate data
-
-
 def generate_data(program, template):
     with open('data/bq-text.json', 'r') as file:
         data = json.load(file)
@@ -96,17 +71,17 @@ Please include specific steps and rationale for each step."""
 )
 # llm = Bedrock(model="anthropic.claude-instant-v1", max_tokens=8000, max_retries=2)
 llm = OpenAI(model="gpt-3.5-turbo-1106",
-             api_key="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")
+             api_key=openai_key)
 
 program = LLMTextCompletionProgram.from_defaults(
     llm=llm,
     output_parser=PydanticOutputParser(BusinessProblemModel),
     verbose=True,
     prompt_template_str=""
-    
+
 )
 
-#program = make_program()
+# program = make_program()
 # Data generation and writing to file
 syn_data = generate_data(program, template_3)
 write_synthetic(syn_data)
