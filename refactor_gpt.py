@@ -98,16 +98,6 @@ Please include specific steps and rationale for each step."""
 llm = OpenAI(model="gpt-3.5-turbo-1106",
              api_key="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")
 
-
-def make_program():
-    return LLMTextCompletionProgram.from_defaults(
-        llm=llm,
-        output_parser=PydanticOutputParser(BusinessProblemModel),
-        verbose=True,
-        prompt_template_str=""
-    )
-
-
 program = LLMTextCompletionProgram.from_defaults(
     llm=llm,
     output_parser=PydanticOutputParser(BusinessProblemModel),
