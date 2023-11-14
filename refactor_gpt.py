@@ -18,8 +18,8 @@ openai_key = os.getenv("OPENAI_KEY")
 
 
 # Function to generate data
-def generate_data(program, template):
-    with open('data/bq-text.json', 'r') as file:
+def generate_data(program, template, file_name):
+    with open(f'data/{file_name}', 'r') as file:
         data = json.load(file)
 
     syn_data = {}
@@ -48,8 +48,8 @@ def generate_data(program, template):
 # Function to write synthetic data to file
 
 
-def write_synthetic(syn_data):
-    with open("./data/output/synthetic_gpt_35_test.json", "w", encoding="utf-8") as file:
+def write_synthetic(syn_data, file_name):
+    with open(f"./data/output/{file_name}", "w", encoding="utf-8") as file:
         for example in syn_data.values():
             file.write(json.dumps(example) + "\n")
 
@@ -83,5 +83,7 @@ program = LLMTextCompletionProgram.from_defaults(
 
 # program = make_program()
 # Data generation and writing to file
-syn_data = generate_data(program, template_3)
-write_synthetic(syn_data)
+input_file_name = "bq-text.json"
+output_file_name ="synthetic_gpt_35_test.json"
+syn_data = generate_data(program, template_3, input_file_name)
+write_synthetic(syn_data, output_file_name)
